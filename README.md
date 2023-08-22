@@ -125,3 +125,28 @@ Note: If you are more familiar with docker, manage this setup locally as needed.
 - `CSC_HTTP_PORT=3000 ./serverA`
 
 - Visit `http://localhost:3000/v1/jobs
+
+
+## Run Process C
+
+- create or update `./CSC/pkg/local.yaml`. An example configuration:
+  
+    - REDIS_PORT: 6379
+
+    - REDIS_PASSWORD: eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
+
+    - REDIS_HOSTNAME: localhost
+  
+    - DB_USERNAME: cscjapi
+  
+    - DB_PASSWORD: eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
+
+    - DB_PORT: 5433
+
+    - DB_HOSTNAME: localhost
+
+- `go build -o serverA ./cmd/processC`
+
+- `CSC_CRON_SCHEDULE="*/10 * * * * *" ./processC`
+
+- Visit `http://localhost:3000/v1/jobs
