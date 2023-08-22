@@ -53,7 +53,7 @@ A monitoring service is imperative for the observability of our system. We can i
 
 ## Service E
 
-Some packages will allow the storing and management of logs on disk, it is likely we have a log aggregation service that wants to receive logs from our respective applications over TCP. 
+Some packages will allow the storing and management of logs on disk, it is likely we have a log aggregation service that wants to receive logs from our respective applications over TCP.
 
 ## NOTES ON CLOUD ALTERNATIVES
 
@@ -75,8 +75,6 @@ With runtime environment variables `ENV=production APP_CONFIG_PATH=CSC/pkg/confi
 ## Run Swagger Documentation
 
 - create or update `./CSC/pkg/local.yaml`. An example configuration:
-
-    - HTTP_PORT: 3011
   
     - SWAGGER_PATH: `./CSC`
   
@@ -84,7 +82,46 @@ With runtime environment variables `ENV=production APP_CONFIG_PATH=CSC/pkg/confi
 
 - `go build -o swagger ./cmd/swagger`
 
-- `./swagger`
+- `CSC_HTTP_PORT=3011 ./swagger`
 
 - Visit `http://localhost:3011/swagger
 
+## Run a Redis Server
+
+Retrieve connection information to an existing redis server **or** for local development while in ./CSC run `docker-compose up redis`.
+
+## Run a Postgres Database
+
+Retrieve connection information to an existing database **or** for local development while in ./CSC run `docker-compose up db`.
+
+
+Note: the first time these databases are instantiated, a volume will be created that holds schema (in postgres case) and data. To remove completely and rebuild startup scripts run `docker-compose down postgres --volumes`
+
+Note: From here as we move to deployment we'd want to consider a secret management solution, Hashicorp, AWS, and Google all offer cloud solutions. May need to investigate if the company has an existing solution.
+
+Note: If you are more familiar with docker, manage this setup locally as needed.
+
+
+## Run Server A
+
+- create or update `./CSC/pkg/local.yaml`. An example configuration:
+  
+    - REDIS_PORT: 6379
+
+    - REDIS_PASSWORD: eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
+
+    - REDIS_HOSTNAME: localhost
+  
+    - DB_USERNAME: cscjapi
+  
+    - DB_PASSWORD: eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
+
+    - DB_PORT: 5433
+
+    - DB_HOSTNAME: localhost
+
+- `go build -o serverA ./cmd/serverA`
+
+- `CSC_HTTP_PORT=3000 ./serverA`
+
+- Visit `http://localhost:3000/v1/jobs

@@ -1,0 +1,28 @@
+version: '3.1'
+services:
+  redis:
+    image: redis:6.2-alpine
+    container_name: csc_redis
+    restart: always
+    ports:
+      - 6379
+    command: redis-server --requirepass eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
+    volumes: 
+      - redis:/data
+  db:
+    image: postgres:latest
+    container_name: csc_db
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./database:/docker-entrypoint-initdb.d
+    environment:
+      - POSTGRES_USER=cscjapi
+      - POSTGRES_PASSWORD=eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
+      - POSTGRES_PORT=5432
+    ports:
+      - 5432
+
+volumes:
+  pgdata:
+  redis:
+    driver: local
