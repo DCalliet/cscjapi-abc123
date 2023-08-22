@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"os"
 
 	alog "github.com/apex/log"
 	"github.com/dcalliet/cscjapi/devtools"
@@ -14,6 +15,7 @@ func main() {
 	v, err := devtools.LoadConfig()
 	if err != nil {
 		alog.WithError(err).Error("failed to load needed configuration")
+		os.Exit(1)
 	}
 
 	var application_config devtools.ApplicationConfig

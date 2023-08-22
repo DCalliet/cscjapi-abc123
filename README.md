@@ -63,3 +63,28 @@ Some packages will allow the storing and management of logs on disk, it is likel
 
 # Getting Started
 
+## Configuration
+
+This process uses [Viper](https://github.com/spf13/viper) to manage configuration. The process uses `APP_CONFIG_PATH` and `APP_CONFIG_FILENAME` to determine what file to consume for configuration. JSON | YAML | TOML files will all be accepted. `APP_CONFIG_PATH` will default to the working directory `CSC/pkg` and `APP_CONFIG_FILENAME` will default to the current `ENV`. `ENV` will default to the value local.
+
+So with no runtime environment variables running a process `./my_app` will load a configuration file like `CSC/pkg/local.yaml`,`CSC/pkg/local.json`, etc.
+
+With runtime environment variables `ENV=production APP_CONFIG_PATH=CSC/pkg/config ./my_app` will load a configuration file like `CSC/pkg/config/production.yaml`, etc.
+
+
+## Run Swagger Documentation
+
+- create or update `./CSC/pkg/local.yaml`. An example configuration:
+
+    - HTTP_PORT: 3011
+  
+    - SWAGGER_PATH: `./CSC`
+  
+    - SWAGGER_FILENAME: `openapi.yaml`
+
+- `go build -o swagger ./cmd/swagger`
+
+- `./swagger`
+
+- Visit `http://localhost:3011/swagger
+
