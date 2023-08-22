@@ -1,0 +1,48 @@
+openapi: 3.0.0
+info:
+  title: Job Processing API
+  version: "1.0"
+  description: Exposes the Create Job and Read Jobs functionality of Job Processing API to authenticated Users.
+
+servers:
+  - url: http://csc.com/api
+paths:
+  /v1/jobs:
+    get:
+      operationId: GetJobsList
+      summary: Given a filter parameter, status, return a list of appropriate jobs. If no parameter value is provided return all jobs.
+      parameters:
+        - name: status
+          in: query
+          description: The job status, if provided, will only return jobs that have match between their provided status.
+          schema:
+            type: string
+      responses:
+        "401":
+          description: unauthorized access
+        "200":
+          description: operation completed with no issues, empty results will return a 200 and an empty array
+    post:
+      operationId: PutJob
+      summary: Given a payload of JSON data, expects our job function to create a new job with provided data.
+      parameters:
+        - in: header
+          name: authorization
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+      responses:
+        201:
+          description: Operation successfully completed
+        400:
+          description: Improper payload, message expects non-empty string
+        "500":
+          description: Unexpected error
