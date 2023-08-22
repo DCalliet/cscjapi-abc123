@@ -62,7 +62,7 @@ type ApplicationConfig struct {
 	EnvRedisHostname      string `json:"REDIS_HOSTNAME" mapstructure:"REDIS_HOSTNAME"`
 	EnvRedisPassword      string `json:"REDIS_PASSWORD" mapstructure:"REDIS_PASSWORD"`
 	EnvRedisPort          string `json:"REDIS_PORT" mapstructure:"REDIS_PORT"`
-	EnvWorkerCronSchedule string `json:"CRON_SCHEDULE" mapstructure:"CRON_SCHEDULE`
+	EnvWorkerCronSchedule string `json:"CRON_SCHEDULE" mapstructure:"CRON_SCHEDULE"`
 }
 
 type SwaggerConfig struct {

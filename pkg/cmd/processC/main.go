@@ -24,12 +24,13 @@ func main() {
 
 	// Instance of GoCron Scheduler
 	s := gocron.NewScheduler(time.UTC)
-	alog.Info(fmt.Sprint("Cron Schedule", application_config.EnvWorkerCronSchedule))
+	alog.Info(fmt.Sprintf("Cron Schedule '%s'", application_config.EnvWorkerCronSchedule))
 	_, err = s.CronWithSeconds(application_config.EnvWorkerCronSchedule).Do(func() {
 		alog.Info("ok")
 	})
 	if err != nil {
 		alog.WithError(err).Error("failed to have worker begin cron job.")
+		os.Exit(1)
 	}
 
 	alog.Info("process C incrementally working on Queue Tasks")

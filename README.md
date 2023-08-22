@@ -145,7 +145,7 @@ Note: If you are more familiar with docker, manage this setup locally as needed.
 
     - DB_HOSTNAME: localhost
 
-- `go build -o serverA ./cmd/processC`
+- `go build -o processC ./cmd/processC`
 
 - `CSC_CRON_SCHEDULE="*/10 * * * * *" ./processC`
 
