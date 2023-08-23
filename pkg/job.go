@@ -5,6 +5,7 @@ import (
 	_ "embed"
 	"fmt"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/adjust/rmq/v5"
@@ -41,7 +42,7 @@ func GetJobs(db *sql.DB, status string) (*sql.Rows, error) {
 
 	for _, testStatus := range validStatus {
 		if testStatus == status {
-			return db.Query(fmt.Sprintf(`%s AND "jobs"."status" = %s`, job_select_sql, status))
+			return db.Query(fmt.Sprintf(`%s AND job.status = %s`, job_select_sql, status))
 		}
 	}
 	return db.Query(job_select_sql)
@@ -70,7 +71,9 @@ func PrepareJob(db *sql.DB, conn rmq.Connection, b []byte) (result sql.Result, e
 
 	h := make(http.Header)
 	h.Set("job-id", fmt.Sprint(id))
-	err = queue.PublishBytes(rmq.PayloadBytesWithHeader(b, h))
+	payload := rmq.PayloadBytesWithHeader(b, h)
+	alog.Info(string(payload))
+	err = queue.PublishBytes(payload)
 	if err != nil {
 		return
 	}
@@ -79,13 +82,43 @@ func PrepareJob(db *sql.DB, conn rmq.Connection, b []byte) (result sql.Result, e
 	return
 }
 
+type Consumer struct {
+	Db *sql.DB
+}
+
+func (c *Consumer) Consume(delivery rmq.Delivery) {
+	ProcessJob(c.Db, delivery)
+}
+
 func ProcessJob(db *sql.DB, delivery rmq.Delivery) (result sql.Result, err error) {
-	header, payload, err := rmq.ExtractHeaderAndPayload(delivery.Payload())
+	var id int
+	var payload string
+	if wh, ok := delivery.(rmq.WithHeader); ok {
+		idToConv := wh.Header().Get("job-id")
+		id, err = strconv.Atoi(idToConv)
+		if err != nil {
+			return
+		}
+		payload = delivery.Payload()
+	} else {
+		var header http.Header
+		header, payload, err = rmq.ExtractHeaderAndPayload(delivery.Payload())
+		if err != nil {
+			return
+		}
+		idToConv := header.Get("job-id")
+		id, err = strconv.Atoi(idToConv)
+		if err != nil {
+			return
+		}
+	}
+
 	if err != nil {
+		alog.Info("Uh oh! Missing JobId. Rejecting")
+		err = delivery.Reject()
+		result, _ = db.Exec(fmt.Sprint(job_update_sql, ", rejected_at = $2 WHERE id = $3"), "rejected", time.Now().Format(time.RFC3339), id)
 		return
 	}
-	id := header.Get("job-id")
-
 	result, err = db.Exec(fmt.Sprint(job_update_sql, ", started_at = $2 WHERE id = $3"), "unacked", time.Now().Format(time.RFC3339), id)
 	if err != nil {
 		return

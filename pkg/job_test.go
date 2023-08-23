@@ -95,7 +95,7 @@ func (suite *JobsTestSuite) Test_GetJobs_ImproperStatus() {
 func (suite *JobsTestSuite) Test_GetJobs_Status() {
 	status := "processed"
 	suite.mock.
-		ExpectQuery(regexp.QuoteMeta(fmt.Sprintf(`%s AND "jobs"."status" = %s`, job_select_sql, status))).
+		ExpectQuery(regexp.QuoteMeta(fmt.Sprintf(`%s AND job.status = %s`, job_select_sql, status))).
 		WillReturnRows(sqlmock.NewRows([]string{
 			"id",
 			"data",
@@ -155,12 +155,12 @@ func (suite *JobsTestSuite) Test_ProcessJob() {
 	// Prepare Mocked Database for expected calls
 	suite.mock.
 		ExpectExec(regexp.QuoteMeta(fmt.Sprint(job_update_sql, ", started_at = $2 WHERE id = $3"))).
-		WithArgs("unacked", sqlmock.AnyArg(), fmt.Sprint(new_job_id)).
+		WithArgs("unacked", sqlmock.AnyArg(), new_job_id).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 
 	suite.mock.
 		ExpectExec(regexp.QuoteMeta(fmt.Sprint(job_update_sql, ", acknowledged_at = $2 WHERE id = $3"))).
-		WithArgs("processed", sqlmock.AnyArg(), fmt.Sprint(new_job_id)).
+		WithArgs("processed", sqlmock.AnyArg(), new_job_id).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 
 	_, err = ProcessJob(suite.db, delivery)
@@ -177,12 +177,12 @@ func (suite *JobsTestSuite) Test_ProcessJob_RejectEmptyPayload() {
 	// Prepare Mocked Database for expected calls
 	suite.mock.
 		ExpectExec(regexp.QuoteMeta(fmt.Sprint(job_update_sql, ", started_at = $2 WHERE id = $3"))).
-		WithArgs("unacked", sqlmock.AnyArg(), fmt.Sprint(new_job_id)).
+		WithArgs("unacked", sqlmock.AnyArg(), new_job_id).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 
 	suite.mock.
 		ExpectExec(regexp.QuoteMeta(fmt.Sprint(job_update_sql, ", acknowledged_at = $2 WHERE id = $3"))).
-		WithArgs("processed", sqlmock.AnyArg(), fmt.Sprint(new_job_id)).
+		WithArgs("processed", sqlmock.AnyArg(), new_job_id).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 
 	_, err := ProcessJob(suite.db, delivery)

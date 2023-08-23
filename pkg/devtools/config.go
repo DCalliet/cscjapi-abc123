@@ -30,7 +30,7 @@ func LoadConfig() (v *viper.Viper, err error) {
 	v.BindEnv("SWAGGER_PATH")
 	v.BindEnv("SWAGGER_FILENAME")
 
-	v.BindEnv("CRON_SCHEDULE")
+	v.BindEnv("WORKER_POLLING_WAIT_IN_SECONDS")
 
 	// Set Default Values where appropriate
 	v.SetDefault("HTTP_PORT", 3001)
@@ -42,7 +42,7 @@ func LoadConfig() (v *viper.Viper, err error) {
 	v.SetDefault("APP_CONFIG_FILENAME", v.GetString("ENV"))
 	v.SetDefault("APP_CONFIG_PATH", dir)
 
-	v.SetDefault("CRON_SCHEDULE", "*/10 * * * * *")
+	v.SetDefault("WORKER_POLLING_WAIT_IN_SECONDS", 10)
 
 	// Loads configuration file from ./appconfig.{yaml|json}
 	v.SetConfigName(v.GetString("APP_CONFIG_FILENAME"))
@@ -52,17 +52,17 @@ func LoadConfig() (v *viper.Viper, err error) {
 }
 
 type ApplicationConfig struct {
-	EnvName               string `json:"ENV" mapstructure:"ENV"`
-	EnvHTTPPort           int    `json:"HTTP_PORT" mapstructure:"HTTP_PORT"`
-	EnvDBUsername         string `json:"DB_USERNAME" mapstructure:"DB_USERNAME"`
-	EnvDBPassword         string `json:"DB_PASSWORD" mapstructure:"DB_PASSWORD"`
-	EnvDBName             string `json:"DB_NAME" mapstructure:"DB_NAME"`
-	EnvDBHostname         string `json:"DB_HOSTNAME" mapstructure:"DB_HOSTNAME"`
-	EnvDBPort             string `json:"DB_PORT" mapstructure:"DB_PORT"`
-	EnvRedisHostname      string `json:"REDIS_HOSTNAME" mapstructure:"REDIS_HOSTNAME"`
-	EnvRedisPassword      string `json:"REDIS_PASSWORD" mapstructure:"REDIS_PASSWORD"`
-	EnvRedisPort          string `json:"REDIS_PORT" mapstructure:"REDIS_PORT"`
-	EnvWorkerCronSchedule string `json:"CRON_SCHEDULE" mapstructure:"CRON_SCHEDULE"`
+	EnvName                       string `json:"ENV" mapstructure:"ENV"`
+	EnvHTTPPort                   int    `json:"HTTP_PORT" mapstructure:"HTTP_PORT"`
+	EnvDBUsername                 string `json:"DB_USERNAME" mapstructure:"DB_USERNAME"`
+	EnvDBPassword                 string `json:"DB_PASSWORD" mapstructure:"DB_PASSWORD"`
+	EnvDBName                     string `json:"DB_NAME" mapstructure:"DB_NAME"`
+	EnvDBHostname                 string `json:"DB_HOSTNAME" mapstructure:"DB_HOSTNAME"`
+	EnvDBPort                     string `json:"DB_PORT" mapstructure:"DB_PORT"`
+	EnvRedisHostname              string `json:"REDIS_HOSTNAME" mapstructure:"REDIS_HOSTNAME"`
+	EnvRedisPassword              string `json:"REDIS_PASSWORD" mapstructure:"REDIS_PASSWORD"`
+	EnvRedisPort                  string `json:"REDIS_PORT" mapstructure:"REDIS_PORT"`
+	EnvWorkerPollingWaitInSeconds int    `json:"WORKER_POLLING_WAIT_IN_SECONDS" mapstructure:"WORKER_POLLING_WAIT_IN_SECONDS"`
 }
 
 type SwaggerConfig struct {
