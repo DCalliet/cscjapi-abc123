@@ -1,0 +1,1 @@
+UPDATE job SET updated_at = NOW(), status = ?

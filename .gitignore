@@ -1,7 +1,3 @@
-# Binaries expected to exist
-serverA
-swagger
-
 # Configuration File
 pkg/*.yaml
 
