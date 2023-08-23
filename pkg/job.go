@@ -48,6 +48,8 @@ func GetJobs(db *sql.DB, status string) (*sql.Rows, error) {
 }
 
 func PrepareJob(db *sql.DB, conn rmq.Connection, b []byte) (result sql.Result, err error) {
+	alog.WithField("b", string(b)).Info("PrepareJob")
+	defer alog.Trace("PrepareJob").Stop(nil)
 	rows, err := db.Query(job_insert_sql, string(b), "created", time.Now().Format(time.RFC3339))
 	if err != nil {
 		return
@@ -73,7 +75,7 @@ func PrepareJob(db *sql.DB, conn rmq.Connection, b []byte) (result sql.Result, e
 		return
 	}
 
-	result, err = db.Exec(fmt.Sprint(job_update_sql, ", published_at = ? WHERE id = ?"), "published", time.Now().Format(time.RFC3339), id)
+	result, err = db.Exec(fmt.Sprint(job_update_sql, ", published_at = $2 WHERE id = $3"), "published", time.Now().Format(time.RFC3339), id)
 	return
 }
 
@@ -84,7 +86,7 @@ func ProcessJob(db *sql.DB, delivery rmq.Delivery) (result sql.Result, err error
 	}
 	id := header.Get("job-id")
 
-	result, err = db.Exec(fmt.Sprint(job_update_sql, ", started_at = ? WHERE id = ?"), "unacked", time.Now().Format(time.RFC3339), id)
+	result, err = db.Exec(fmt.Sprint(job_update_sql, ", started_at = $2 WHERE id = $3"), "unacked", time.Now().Format(time.RFC3339), id)
 	if err != nil {
 		return
 	}
@@ -92,11 +94,11 @@ func ProcessJob(db *sql.DB, delivery rmq.Delivery) (result sql.Result, err error
 	if payload == "" {
 		alog.Info("Uh oh! Empty Payload. Rejecting")
 		err = delivery.Reject()
-		result, _ = db.Exec(fmt.Sprint(job_update_sql, ", rejected_at = ? WHERE id = ?"), "rejected", time.Now().Format(time.RFC3339), id)
+		result, _ = db.Exec(fmt.Sprint(job_update_sql, ", rejected_at = $2 WHERE id = $3"), "rejected", time.Now().Format(time.RFC3339), id)
 		return
 	} else {
 		err = delivery.Ack()
-		result, _ = db.Exec(fmt.Sprint(job_update_sql, ", acknowledged_at = ? WHERE id = ?"), "processed", time.Now().Format(time.RFC3339), id)
+		result, _ = db.Exec(fmt.Sprint(job_update_sql, ", acknowledged_at = $2 WHERE id = $3"), "processed", time.Now().Format(time.RFC3339), id)
 		return
 	}
 }

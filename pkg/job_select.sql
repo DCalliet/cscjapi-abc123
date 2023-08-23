@@ -1,1 +1,1 @@
-SELECT * FROM "job" WHERE "job"."deleted_at" IS NULL
+SELECT * FROM job WHERE deleted_at IS NULL

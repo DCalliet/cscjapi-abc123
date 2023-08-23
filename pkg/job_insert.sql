@@ -1,5 +1,1 @@
-INSERT INTO "job" (
-  data,
-  status,
-  created_at
-) VALUES (?, ?, ?) RETURNING "job"."id"
+INSERT INTO job (id,data,status,created_at) VALUES (nextval('job_id_seq'::regclass), $1, $2, $3) RETURNING id

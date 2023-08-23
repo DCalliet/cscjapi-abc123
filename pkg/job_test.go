@@ -127,7 +127,7 @@ func (suite *JobsTestSuite) Test_PrepareJob() {
 		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(new_job_id))
 
 	suite.mock.
-		ExpectExec(regexp.QuoteMeta(fmt.Sprint(job_update_sql, ", published_at = ? WHERE id = ?"))).
+		ExpectExec(regexp.QuoteMeta(fmt.Sprint(job_update_sql, ", published_at = $2 WHERE id = $3"))).
 		WithArgs("published", sqlmock.AnyArg(), new_job_id).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 
@@ -154,12 +154,12 @@ func (suite *JobsTestSuite) Test_ProcessJob() {
 
 	// Prepare Mocked Database for expected calls
 	suite.mock.
-		ExpectExec(regexp.QuoteMeta(fmt.Sprint(job_update_sql, ", started_at = ? WHERE id = ?"))).
+		ExpectExec(regexp.QuoteMeta(fmt.Sprint(job_update_sql, ", started_at = $2 WHERE id = $3"))).
 		WithArgs("unacked", sqlmock.AnyArg(), fmt.Sprint(new_job_id)).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 
 	suite.mock.
-		ExpectExec(regexp.QuoteMeta(fmt.Sprint(job_update_sql, ", acknowledged_at = ? WHERE id = ?"))).
+		ExpectExec(regexp.QuoteMeta(fmt.Sprint(job_update_sql, ", acknowledged_at = $2 WHERE id = $3"))).
 		WithArgs("processed", sqlmock.AnyArg(), fmt.Sprint(new_job_id)).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 
@@ -176,12 +176,12 @@ func (suite *JobsTestSuite) Test_ProcessJob_RejectEmptyPayload() {
 
 	// Prepare Mocked Database for expected calls
 	suite.mock.
-		ExpectExec(regexp.QuoteMeta(fmt.Sprint(job_update_sql, ", started_at = ? WHERE id = ?"))).
+		ExpectExec(regexp.QuoteMeta(fmt.Sprint(job_update_sql, ", started_at = $2 WHERE id = $3"))).
 		WithArgs("unacked", sqlmock.AnyArg(), fmt.Sprint(new_job_id)).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 
 	suite.mock.
-		ExpectExec(regexp.QuoteMeta(fmt.Sprint(job_update_sql, ", acknowledged_at = ? WHERE id = ?"))).
+		ExpectExec(regexp.QuoteMeta(fmt.Sprint(job_update_sql, ", acknowledged_at = $2 WHERE id = $3"))).
 		WithArgs("processed", sqlmock.AnyArg(), fmt.Sprint(new_job_id)).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 

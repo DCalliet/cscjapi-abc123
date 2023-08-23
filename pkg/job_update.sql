@@ -1,1 +1,1 @@
-UPDATE job SET updated_at = NOW(), status = ?
+UPDATE job SET updated_at = NOW(), status = $1

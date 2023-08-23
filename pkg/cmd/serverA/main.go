@@ -62,7 +62,7 @@ func main() {
 		if request.Method == "GET" || request.Method == "" {
 			values := request.URL.Query()
 			status := values.Get("status")
-			jobs := []map[string]string{}
+			jobs := []map[string]*string{}
 			rows, err := japi.GetJobs(db, status)
 			if err != nil {
 				http.Error(response, err.Error(), http.StatusInternalServerError)
@@ -71,22 +71,25 @@ func main() {
 			for rows.Next() {
 				var (
 					id              int
-					data            string
-					status          string
-					created_at      string
-					published_at    string
-					started_at      string
-					acknowledged_at string
-					rejected_at     string
-					updated_at      string
-					deleted_at      string
+					convID          string
+					data            *string
+					status          *string
+					created_at      *string
+					published_at    *string
+					started_at      *string
+					acknowledged_at *string
+					rejected_at     *string
+					updated_at      *string
+					deleted_at      *string
 				)
 				err = rows.Scan(&id, &data, &status, &created_at, &published_at, &started_at, &acknowledged_at, &rejected_at, &updated_at, &deleted_at)
 				if err != nil {
+					alog.WithError(err).Error("failed to scan row")
 					break
 				}
-				found := map[string]string{
-					"id":              fmt.Sprint(id),
+				convID = fmt.Sprint(id)
+				found := map[string]*string{
+					"id":              &convID,
 					"data":            data,
 					"status":          status,
 					"created_at":      created_at,

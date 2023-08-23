@@ -118,7 +118,9 @@ Note: If you are more familiar with docker, manage this setup locally as needed.
 
     - DB_PORT: 5433
 
-    - DB_HOSTNAME: **TIP: use docker inspect to find database ip address**
+    - DB_HOSTNAME: localhost
+    - DB_NAME: postgres
+
 
 - `go build -o serverA ./cmd/serverA`
 
@@ -143,10 +145,12 @@ Note: If you are more familiar with docker, manage this setup locally as needed.
 
     - DB_PORT: 5433
 
-    - DB_HOSTNAME: **TIP: use docker inspect to find database IP address**
+    - DB_HOSTNAME: localhost
+
+    - DB_NAME: postgres
 
 - `go build -o processC ./cmd/processC`
 
 - `CSC_CRON_SCHEDULE="*/10 * * * * *" ./processC`
 
-- Visit `http://localhost:3000/v1/jobs
+- `curl http://localhost:3000/v1/jobs` or `curl --location 'http://localhost:3000/v1/jobs' --header 'Content-Type: application/json' --data '{ "message": "Hello!" }'`

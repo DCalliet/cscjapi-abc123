@@ -18,6 +18,7 @@ services:
     environment:
       - POSTGRES_USER=cscjapi
       - POSTGRES_PASSWORD=eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
+      - POSTGRES_DB=postgres
       - POSTGRES_PORT=5432
     ports:
       - '5433:5432'
