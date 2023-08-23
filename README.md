@@ -35,6 +35,9 @@ The application system will make use of:
   - a logging service, Service E.
 
 
+  - a SQL database (postgres), Server F.
+
+
 ## Server A   
 
 Server A will have a long running process baked into a container. It allows clients to use the API via HTTP. See `openapi.yaml` for detailed API structure. Security implications for server A include network access and authorization. The server should be accessible via LB -> firewall. Expected traffic should be served to its configured port. Traffic will come from both public consumers, and machine consumers such as the monitoring Service D (tools like prometheous use polling). Authorization can be implemented using Oauth 2.0 specifications, which would allow us to further secure which clients can preform write and / or read actions via scopes. Doing this would require the implementation of an exchange server but I suggest for v1 we forgo authentication and coorindate with the company if an existing user identity solution exists. Server A should plan to implement a message queue wrapper that sits on a redis database. ex. https://github.com/adjust/rmq
@@ -54,6 +57,10 @@ A monitoring service is imperative for the observability of our system. We can i
 ## Service E (Out of scope)
 
 Some packages will allow the storing and management of logs on disk, it is likely we have a log aggregation service that wants to receive logs from our respective applications over TCP.
+
+## Server F
+
+This SQL database will support the on disk collection of Jobs after our queuing system has acknowledged them.
 
 ## NOTES ON CLOUD ALTERNATIVES
 
