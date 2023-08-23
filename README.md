@@ -118,13 +118,13 @@ Note: If you are more familiar with docker, manage this setup locally as needed.
 
     - DB_PORT: 5433
 
-    - DB_HOSTNAME: localhost
+    - DB_HOSTNAME: **TIP: use docker inspect to find database ip address**
 
 - `go build -o serverA ./cmd/serverA`
 
 - `CSC_HTTP_PORT=3000 ./serverA`
 
-- Visit `http://localhost:3000/v1/jobs
+- Visit `http://localhost:3000/v1/jobs`
 
 
 ## Run Process C
@@ -143,7 +143,7 @@ Note: If you are more familiar with docker, manage this setup locally as needed.
 
     - DB_PORT: 5433
 
-    - DB_HOSTNAME: localhost
+    - DB_HOSTNAME: **TIP: use docker inspect to find database IP address**
 
 - `go build -o processC ./cmd/processC`
 

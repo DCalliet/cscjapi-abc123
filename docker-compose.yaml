@@ -20,7 +20,7 @@ services:
       - POSTGRES_PASSWORD=eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
       - POSTGRES_PORT=5432
     ports:
-      - 5432
+      - '5433:5432'
 
 volumes:
   pgdata:

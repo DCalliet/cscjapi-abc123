@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"os"
 
+	_ "github.com/jackc/pgx/v5/stdlib"
+
 	"github.com/adjust/rmq/v5"
 	alog "github.com/apex/log"
 	japi "github.com/dcalliet/cscjapi"
@@ -36,6 +38,11 @@ func main() {
 		alog.WithError(err).Error("failed to open database connection")
 		os.Exit(1)
 	}
+	_, err = db.Query("SELECT 1;")
+	if err != nil {
+		alog.WithError(err).Error("failed to confirm db connection")
+		os.Exit(1)
+	}
 	redis_options := &redis.Options{
 		Addr:     fmt.Sprintf("%s:%s", application_config.EnvRedisHostname, application_config.EnvRedisPort),
 		Password: application_config.EnvDBPassword, // no password set
@@ -52,7 +59,7 @@ func main() {
 	router := http.NewServeMux()
 
 	router.HandleFunc("/v1/jobs", func(response http.ResponseWriter, request *http.Request) {
-		if request.Method == "GET" {
+		if request.Method == "GET" || request.Method == "" {
 			values := request.URL.Query()
 			status := values.Get("status")
 			jobs := []map[string]string{}
@@ -78,7 +85,7 @@ func main() {
 				if err != nil {
 					break
 				}
-				jobs = append(jobs, map[string]string{
+				found := map[string]string{
 					"id":              fmt.Sprint(id),
 					"data":            data,
 					"status":          status,
@@ -89,7 +96,9 @@ func main() {
 					"rejected_at":     rejected_at,
 					"updated_at":      updated_at,
 					"deleted_at":      deleted_at,
-				})
+				}
+				alog.WithField("found", found).Info("moving on")
+				jobs = append(jobs, found)
 			}
 			if closeErr := rows.Close(); closeErr != nil {
 				http.Error(response, closeErr.Error(), http.StatusInternalServerError)
@@ -126,11 +135,13 @@ func main() {
 			}
 			response.WriteHeader(http.StatusNoContent)
 			return
+		} else {
+			response.WriteHeader(http.StatusMethodNotAllowed)
 		}
 	})
 
 	// Start Application
-
+	alog.WithField("port", application_config.EnvHTTPPort).Info("start serverA")
 	if err := http.ListenAndServe(fmt.Sprint(":", application_config.EnvHTTPPort), router); err != nil {
 		alog.WithError(err).Error(fmt.Sprint("unable to run server on port :", application_config.EnvHTTPPort))
 	}

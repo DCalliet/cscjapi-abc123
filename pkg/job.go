@@ -29,12 +29,14 @@ type Task struct {
 }
 
 func GetJobs(db *sql.DB, status string) (*sql.Rows, error) {
+	alog.WithField("status", status).Info("GetJobs")
+	defer alog.Trace("GetJobs").Stop(nil)
 	validStatus := []string{
-		"created",
-		"published",
-		"unacked",
-		"rejected",
-		"processed",
+		"created",   // task not in queue
+		"published", // task published to queue
+		"unacked",   // task picked for consumption
+		"rejected",  // task rejected
+		"processed", // task completed
 	}
 
 	for _, testStatus := range validStatus {
