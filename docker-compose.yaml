@@ -22,6 +22,55 @@ services:
       - POSTGRES_PORT=5432
     ports:
       - '5433:5432'
+  
+  server_a:
+    build:
+      context: .
+      dockerfile: ./docker/serverA/Dockerfile
+    environment:
+      - CSC_ENV=local
+      - CSC_HTTP_PORT=3000
+      - CSC_REDIS_PORT=6379
+      - CSC_REDIS_PASSWORD=eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
+      - CSC_REDIS_HOSTNAME=redis
+      - CSC_DB_USERNAME=cscjapi
+      - CSC_DB_PASSWORD=eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
+      - CSC_DB_PORT=5432
+      - CSC_DB_HOSTNAME=db
+      - CSC_DB_NAME=postgres
+    ports:
+      - '3000:3000'
+
+  process_c:
+    build:
+      context: .
+      dockerfile: ./docker/processC/Dockerfile
+    environment:
+      - CSC_ENV=local
+      - CSC_HTTP_PORT=3001
+      - CSC_REDIS_PORT=6379
+      - CSC_REDIS_PASSWORD=eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
+      - CSC_REDIS_HOSTNAME=redis
+      - CSC_DB_USERNAME=cscjapi
+      - CSC_DB_PASSWORD=eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
+      - CSC_DB_PORT=5432
+      - CSC_DB_HOSTNAME=db
+      - CSC_DB_NAME=postgres
+      - CSC_WORKER_POLLING_WAIT_IN_SECONDS=5
+    ports:
+      - '3001:3001'
+
+  swagger:
+    build:
+      context: .
+      dockerfile: ./docker/swagger/Dockerfile
+    environment:
+      - CSC_ENV=local
+      - CSC_HTTP_PORT=3002
+      - CSC_SWAGGER_PATH=.
+      - CSC_SWAGGER_FILENAME=openapi.yaml
+    ports:
+      - '3002:3002'
 
 volumes:
   pgdata:

@@ -37,6 +37,14 @@ func main() {
 		alog.WithError(err).Error("failed to open database connection")
 		os.Exit(1)
 	}
+	for {
+		if err = db.Ping(); err != nil {
+			alog.WithError(err).Error("unable to establish a databse connection, retry in 5 seconds")
+			time.Sleep(time.Duration(5) * time.Second)
+		} else {
+			break
+		}
+	}
 	_, err = db.Query("SELECT 1;")
 	if err != nil {
 		alog.WithError(err).Error("failed to confirm db connection")
@@ -47,10 +55,17 @@ func main() {
 		Password: application_config.EnvDBPassword, // no password set
 		DB:       0,                                // use default DB
 	}
-	connection, err := rmq.OpenConnectionWithRedisOptions("my service", redis_options, errChan)
-	if err != nil {
-		alog.WithError(err).Error("failed to open redis connection")
-		os.Exit(1)
+
+	var connection rmq.Connection
+
+	for {
+		connection, err = rmq.OpenConnectionWithRedisOptions("my service", redis_options, errChan)
+		if err != nil {
+			alog.WithError(err).Error("failed to open redis connection, retry in 5 seconds.")
+			time.Sleep(time.Duration(5) * time.Second)
+		} else {
+			break
+		}
 	}
 
 	taskQueue, err := connection.OpenQueue(japi.JOBS_QUEUE_NAME)

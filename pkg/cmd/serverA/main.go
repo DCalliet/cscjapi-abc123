@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"time"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
 
@@ -38,20 +39,31 @@ func main() {
 		alog.WithError(err).Error("failed to open database connection")
 		os.Exit(1)
 	}
-	_, err = db.Query("SELECT 1;")
-	if err != nil {
-		alog.WithError(err).Error("failed to confirm db connection")
-		os.Exit(1)
+	for {
+		if err = db.Ping(); err != nil {
+			alog.WithError(err).Error("unable to establish a database connection, retry in 5 seconds.")
+			time.Sleep(time.Duration(5) * time.Second)
+		} else {
+			break
+		}
 	}
+
 	redis_options := &redis.Options{
 		Addr:     fmt.Sprintf("%s:%s", application_config.EnvRedisHostname, application_config.EnvRedisPort),
 		Password: application_config.EnvDBPassword, // no password set
 		DB:       0,                                // use default DB
 	}
-	connection, err := rmq.OpenConnectionWithRedisOptions("my service", redis_options, errChan)
-	if err != nil {
-		alog.WithError(err).Error("failed to open redis connection")
-		os.Exit(1)
+
+	var connection rmq.Connection
+
+	for {
+		connection, err = rmq.OpenConnectionWithRedisOptions("my service", redis_options, errChan)
+		if err != nil {
+			alog.WithError(err).Error("failed to open redis connection, retry in 5 seconds.")
+			time.Sleep(time.Duration(5) * time.Second)
+		} else {
+			break
+		}
 	}
 
 	// Construct Route(s) and attach Route Handler

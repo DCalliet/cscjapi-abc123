@@ -1,8 +1,15 @@
 # Darius Calliet August 2023
 
+# Quick Start
+
+- run `docker-compose up`. After the images build, you can open your web browser to http://localhost:3002/swagger/. Then using your favorite HTTP request tool, can interact with the API on port 3001.
+
+Happy Hacking!
+
+
 # Job Proccessing API
 
-This application is designed to enable an end users to Queue up messages that will be consumed in a LIFO manner by our worker process to fulfil our business needs. 
+This application is designed to enable an end users to Queue up messages that will be consumed in a FIFO manner by our worker process to fulfil our business needs. 
 
 Additionally as we deploy this production system, we've built or incorporated tools into the application ecosystem to support engineering goals and will touch on these throughout:
 
